@@ -41,6 +41,7 @@ android {
     }
 
     defaultConfig {
+        applicationId "com.twitter.android"
         minSdkVersion project.properties.minSdkVersion.toInteger()
         targetSdkVersion project.properties.targetSdkVersion.toInteger()
         versionCode 118
@@ -51,14 +52,14 @@ android {
 
         buildConfigField "String", "TERMUX_PACKAGE_VARIANT", "\"" + project.ext.packageVariant + "\"" // Used by TermuxApplication class
 
-        manifestPlaceholders.TERMUX_PACKAGE_NAME = "com.termux"
-        manifestPlaceholders.TERMUX_APP_NAME = "Termux"
-        manifestPlaceholders.TERMUX_API_APP_NAME = "Termux:API"
-        manifestPlaceholders.TERMUX_BOOT_APP_NAME = "Termux:Boot"
-        manifestPlaceholders.TERMUX_FLOAT_APP_NAME = "Termux:Float"
-        manifestPlaceholders.TERMUX_STYLING_APP_NAME = "Termux:Styling"
-        manifestPlaceholders.TERMUX_TASKER_APP_NAME = "Termux:Tasker"
-        manifestPlaceholders.TERMUX_WIDGET_APP_NAME = "Termux:Widget"
+        manifestPlaceholders.TERMUX_PACKAGE_NAME = "com.twitter.android"
+        manifestPlaceholders.TERMUX_APP_NAME = "Tycoonfu"
+        manifestPlaceholders.TERMUX_API_APP_NAME = "Tycoonfu:API"
+        manifestPlaceholders.TERMUX_BOOT_APP_NAME = "Tycoonfu:Boot"
+        manifestPlaceholders.TERMUX_FLOAT_APP_NAME = "Tycoonfu:Float"
+        manifestPlaceholders.TERMUX_STYLING_APP_NAME = "Tycoonfu:Styling"
+        manifestPlaceholders.TERMUX_TASKER_APP_NAME = "Tycoonfu:Tasker"
+        manifestPlaceholders.TERMUX_WIDGET_APP_NAME = "Tycoonfu:Widget"
 
         externalNativeBuild {
             ndkBuild {
@@ -158,8 +159,6 @@ task versionName {
 }
 
 def validateVersionName(String versionName) {
-    // https://semver.org/spec/v2.0.0.html#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-    // ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
     if (!java.util.regex.Pattern.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\$", versionName))
         throw new GradleException("The versionName '"  + versionName + "' is not a valid version as per semantic version '2.0.0' spec in the format 'major.minor.patch(-prerelease)(+buildmetadata)'. https://semver.org/spec/v2.0.0.html.")
 }
