@@ -1,6 +1,7 @@
 package com.termux.shared.termux;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 
 import com.termux.shared.shell.command.ExecutionCommand;
@@ -204,6 +205,12 @@ public final class TermuxConstants {
     public static final String TERMUX_CONFIG_PREFIX_DIR_PATH = TERMUX_ETC_PREFIX_DIR_PATH + "/termux";
     public static final File TERMUX_CONFIG_PREFIX_DIR = new File(TERMUX_CONFIG_PREFIX_DIR_PATH);
 
+    public static final String TERMUX_ENV_PREFIX_ROOT = "/data/data/" + TERMUX_PACKAGE_NAME + "/files/usr";
+    public static final String TERMUX_ENV_FILE_PATH = TERMUX_CONFIG_PREFIX_DIR_PATH + "/termux.env";
+    public static final String TERMUX_ENV_TEMP_FILE_PATH = TERMUX_CONFIG_PREFIX_DIR_PATH + "/termux.env.tmp";
+
+    public static final String TERMUX_APPS_DIR_PATH = TERMUX_FILES_DIR_PATH + "/apps";
+
     public static final String TERMUX_CRASH_LOG_FILE_PATH = TERMUX_HOME_DIR_PATH + "/crash-log.md";
     public static final String TERMUX_CRASH_LOG_BACKUP_FILE_PATH = TERMUX_HOME_DIR_PATH + "/crash-log.backup.md";
 
@@ -226,10 +233,17 @@ public final class TermuxConstants {
         public static final String TERMUX_SERVICE_NAME = TERMUX_PACKAGE_NAME + ".app.TermuxService";
         public static final String RUN_COMMAND_SERVICE_NAME = TERMUX_PACKAGE_NAME + ".app.RunCommandService";
 
+        public static final String APPS_DIR_PATH = TERMUX_APPS_DIR_PATH + "/" + TERMUX_PACKAGE_NAME;
+        public static final String TERMUX_AM_SOCKET_FILE_PATH = TERMUX_FILES_DIR_PATH + "/termux-am.sock";
+
+        public static final String FILE_SHARE_RECEIVER_ACTIVITY_CLASS_NAME = TERMUX_PACKAGE_NAME + ".app.api.file.FileShareReceiverActivity";
+        public static final String FILE_VIEW_RECEIVER_ACTIVITY_CLASS_NAME = TERMUX_PACKAGE_NAME + ".app.api.file.FileViewReceiverActivity";
+
         public static final class TERMUX_ACTIVITY {
             public static final String ACTION_FAILSAFE_SESSION = TERMUX_PACKAGE_NAME + ".app.failsafe_session";
             public static final String ACTION_NOTIFY_APP_CRASH = TERMUX_PACKAGE_NAME + ".app.notify_app_crash";
             public static final String ACTION_RELOAD_STYLE = TERMUX_PACKAGE_NAME + ".app.reload_style";
+            public static final String ACTION_REQUEST_PERMISSIONS = TERMUX_PACKAGE_NAME + ".app.request_permissions";
             public static final String EXTRA_FAILSAFE_SESSION = TERMUX_PACKAGE_NAME + ".app.failsafe_session";
             public static final String EXTRA_RECREATE_ACTIVITY = TERMUX_PACKAGE_NAME + ".app.recreate_activity";
         }
@@ -238,6 +252,61 @@ public final class TermuxConstants {
             public static final String ACTION_STOP_SERVICE = TERMUX_PACKAGE_NAME + ".service_stop";
             public static final String EXTRA_ACTION = TERMUX_PACKAGE_NAME + ".service_action";
             public static final String EXTRA_SHELL_NAME = TERMUX_PACKAGE_NAME + ".shell_name";
+            public static final String EXTRA_SESSION_ACTION = TERMUX_PACKAGE_NAME + ".session_action";
+            public static final String EXTRA_COMMAND_LABEL = TERMUX_PACKAGE_NAME + ".command_label";
+            public static final String EXTRA_COMMAND_DESCRIPTION = TERMUX_PACKAGE_NAME + ".command_description";
+            public static final String EXTRA_COMMAND_HELP = TERMUX_PACKAGE_NAME + ".command_help";
+            public static final String EXTRA_PLUGIN_API_HELP = TERMUX_PACKAGE_NAME + ".plugin_api_help";
+            public static final String EXTRA_STDIN = TERMUX_PACKAGE_NAME + ".stdin";
+            public static final String EXTRA_RUNNER = TERMUX_PACKAGE_NAME + ".runner";
+            public static final String EXTRA_SESSION_CREATE_MODE = TERMUX_PACKAGE_NAME + ".session_create_mode";
+            public static final String EXTRA_BACKGROUND_CUSTOM_LOG_LEVEL = TERMUX_PACKAGE_NAME + ".background_custom_log_level";
+        }
+
+        public static final class RUN_COMMAND_SERVICE {
+            public static final String RUN_COMMAND_API_HELP_URL = TERMUX_GITHUB_REPO_URL + "#run-command-service";
+            public static final String EXTRA_COMMAND_PATH = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_PATH";
+            public static final String EXTRA_ARGUMENTS = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_ARGUMENTS";
+            public static final String EXTRA_WORKDIR = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_WORKDIR";
+            public static final String EXTRA_BACKGROUND = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_BACKGROUND";
+            public static final String EXTRA_SESSION_ACTION = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_SESSION_ACTION";
+            public static final String EXTRA_COMMAND_LABEL = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_COMMAND_LABEL";
+            public static final String EXTRA_COMMAND_DESCRIPTION = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_COMMAND_DESCRIPTION";
+            public static final String EXTRA_COMMAND_HELP = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_COMMAND_HELP";
+            public static final String EXTRA_PENDING_INTENT = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_PENDING_INTENT";
+            public static final String EXTRA_STDIN = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_STDIN";
+            public static final String EXTRA_RUNNER = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_RUNNER";
+            public static final String EXTRA_SHELL_NAME = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_SHELL_NAME";
+            public static final String EXTRA_SHELL_CREATE_MODE = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_SHELL_CREATE_MODE";
+            public static final String EXTRA_BACKGROUND_CUSTOM_LOG_LEVEL = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_BACKGROUND_CUSTOM_LOG_LEVEL";
         }
     }
+
+    public static final class TERMUX_API_APP {
+        public static final String TERMUX_API_ACTIVITY_NAME = TERMUX_API_PACKAGE_NAME + ".TermuxApiActivity";
+        public static final String DEFAULT_PREFERENCES_FILE_BASENAME_WITHOUT_EXTENSION = TERMUX_API_PACKAGE_NAME + "_preferences";
+    }
+
+    public static final class TERMUX_BOOT_APP {
+        public static final String DEFAULT_PREFERENCES_FILE_BASENAME_WITHOUT_EXTENSION = TERMUX_BOOT_PACKAGE_NAME + "_preferences";
+    }
+
+    public static final class TERMUX_FLOAT_APP {
+        public static final String DEFAULT_PREFERENCES_FILE_BASENAME_WITHOUT_EXTENSION = TERMUX_FLOAT_PACKAGE_NAME + "_preferences";
+    }
+
+    public static final class TERMUX_STYLING_APP {
+        public static final String DEFAULT_PREFERENCES_FILE_BASENAME_WITHOUT_EXTENSION = TERMUX_STYLING_PACKAGE_NAME + "_preferences";
+    }
+
+    public static final class TERMUX_TASKER_APP {
+        public static final String TERMUX_TASKER_ACTIVITY_NAME = TERMUX_TASKER_PACKAGE_NAME + ".TermuxTaskerActivity";
+        public static final String DEFAULT_PREFERENCES_FILE_BASENAME_WITHOUT_EXTENSION = TERMUX_TASKER_PACKAGE_NAME + "_preferences";
+    }
+
+    public static final class TERMUX_WIDGET_APP {
+        public static final String TERMUX_WIDGET_ACTIVITY_NAME = TERMUX_WIDGET_PACKAGE_NAME + ".TermuxWidgetActivity";
+        public static final String DEFAULT_PREFERENCES_FILE_BASENAME_WITHOUT_EXTENSION = TERMUX_WIDGET_PACKAGE_NAME + "_preferences";
+    }
 }
+
