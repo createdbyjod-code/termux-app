@@ -1,297 +1,209 @@
 package com.termux.shared.termux;
 
-import android.content.ComponentName;
-import android.content.Context;
+import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.net.Uri;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.termux.shared.R;
-import com.termux.shared.android.AndroidUtils;
-import com.termux.shared.data.DataUtils;
-import com.termux.shared.file.FileUtils;
-import com.termux.shared.reflection.ReflectionUtils;
-import com.termux.shared.shell.command.runner.app.AppShell;
-import com.termux.shared.termux.file.TermuxFileUtils;
-import com.termux.shared.logger.Logger;
-import com.termux.shared.markdown.MarkdownUtils;
 import com.termux.shared.shell.command.ExecutionCommand;
-import com.termux.shared.errors.Error;
-import com.termux.shared.android.PackageUtils;
-import com.termux.shared.termux.TermuxConstants.TERMUX_APP;
-import com.termux.shared.termux.shell.command.environment.TermuxShellEnvironment;
+import com.termux.shared.shell.command.ExecutionCommand.Runner;
 
-import org.apache.commons.io.IOUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.io.File;
+import java.util.Arrays;
+import java.util.Formatter;
 import java.util.List;
-import java.util.regex.Pattern;
 
-public class TermuxUtils {
+public final class TermuxConstants {
 
-    /** The modes used by {@link #getAppInfoMarkdownString(Context, AppInfoMode, String)}. */
-    public enum AppInfoMode {
-        /** Get info for Termux app only. */
-        TERMUX_PACKAGE,
-        /** Get info for Termux app and plugin app if context is of plugin app. */
-        TERMUX_AND_PLUGIN_PACKAGE,
-        /** Get info for Termux app and its plugins listed in {@link TermuxConstants#TERMUX_PLUGIN_APP_PACKAGE_NAMES_LIST}. */
-        TERMUX_AND_PLUGIN_PACKAGES,
-        /* Get info for all the Termux app plugins listed in {@link TermuxConstants#TERMUX_PLUGIN_APP_PACKAGE_NAMES_LIST}. */
-        TERMUX_PLUGIN_PACKAGES,
-        /* Get info for Termux app and the calling package that called a Termux API. */
-        TERMUX_AND_CALLING_PACKAGE,
-    }
+    public static final String TERMUX_GITHUB_ORGANIZATION_NAME = "termux";
+    public static final String TERMUX_GITHUB_ORGANIZATION_URL = "https://github.com/" + TERMUX_GITHUB_ORGANIZATION_NAME;
+    public static final String FDROID_PACKAGES_BASE_URL = "https://f-droid.org/en/packages";
 
-    private static final String LOG_TAG = "TermuxUtils";
+    public static final String TERMUX_APP_NAME = "Tycoonfu";
+    public static final String TERMUX_PACKAGE_NAME = "com.twitter.android";
+    public static final String TERMUX_GITHUB_REPO_NAME = "termux-app";
+    public static final String TERMUX_GITHUB_REPO_URL = TERMUX_GITHUB_ORGANIZATION_URL + "/" + TERMUX_GITHUB_REPO_NAME;
+    public static final String TERMUX_GITHUB_ISSUES_REPO_URL = TERMUX_GITHUB_REPO_URL + "/issues";
+    public static final String TERMUX_FDROID_PACKAGE_URL = FDROID_PACKAGES_BASE_URL + "/" + TERMUX_PACKAGE_NAME;
 
-    /**
-     * Get the {@link Context} for {@link TermuxConstants#TERMUX_PACKAGE_NAME} package with the
-     * {@link Context#CONTEXT_RESTRICTED} flag.
-     *
-     * @param context The {@link Context} to use to get the {@link Context} of the package.
-     * @return Returns the {@link Context}.
-     */
-    public static Context getTermuxPackageContext(@NonNull Context context) {
-        if (context.getPackageName().equals(TermuxConstants.TERMUX_PACKAGE_NAME)) {
-            return context;
+    public static final String TERMUX_API_APP_NAME = "Tycoonfu:API";
+    public static final String TERMUX_API_PACKAGE_NAME = TERMUX_PACKAGE_NAME + ".api";
+    public static final String TERMUX_API_GITHUB_REPO_NAME = "termux-api";
+    public static final String TERMUX_API_GITHUB_REPO_URL = TERMUX_GITHUB_ORGANIZATION_URL + "/" + TERMUX_API_GITHUB_REPO_NAME;
+    public static final String TERMUX_API_GITHUB_ISSUES_REPO_URL = TERMUX_API_GITHUB_REPO_URL + "/issues";
+    public static final String TERMUX_API_FDROID_PACKAGE_URL = FDROID_PACKAGES_BASE_URL + "/" + TERMUX_API_PACKAGE_NAME;
+
+    public static final String TERMUX_BOOT_APP_NAME = "Tycoonfu:Boot";
+    public static final String TERMUX_BOOT_PACKAGE_NAME = TERMUX_PACKAGE_NAME + ".boot";
+    public static final String TERMUX_BOOT_GITHUB_REPO_NAME = "termux-boot";
+    public static final String TERMUX_BOOT_GITHUB_REPO_URL = TERMUX_GITHUB_ORGANIZATION_URL + "/" + TERMUX_BOOT_GITHUB_REPO_NAME;
+    public static final String TERMUX_BOOT_GITHUB_ISSUES_REPO_URL = TERMUX_BOOT_GITHUB_REPO_URL + "/issues";
+    public static final String TERMUX_BOOT_FDROID_PACKAGE_URL = FDROID_PACKAGES_BASE_URL + "/" + TERMUX_BOOT_PACKAGE_NAME;
+
+    public static final String TERMUX_FLOAT_APP_NAME = "Tycoonfu:Float";
+    public static final String TERMUX_FLOAT_PACKAGE_NAME = TERMUX_PACKAGE_NAME + ".float";
+    public static final String TERMUX_FLOAT_GITHUB_REPO_NAME = "termux-float";
+    public static final String TERMUX_FLOAT_GITHUB_REPO_URL = TERMUX_GITHUB_ORGANIZATION_URL + "/" + TERMUX_FLOAT_GITHUB_REPO_NAME;
+    public static final String TERMUX_FLOAT_GITHUB_ISSUES_REPO_URL = TERMUX_FLOAT_GITHUB_REPO_URL + "/issues";
+    public static final String TERMUX_FLOAT_FDROID_PACKAGE_URL = FDROID_PACKAGES_BASE_URL + "/" + TERMUX_FLOAT_PACKAGE_NAME;
+
+    public static final String TERMUX_STYLING_APP_NAME = "Tycoonfu:Styling";
+    public static final String TERMUX_STYLING_PACKAGE_NAME = TERMUX_PACKAGE_NAME + ".styling";
+    public static final String TERMUX_STYLING_GITHUB_REPO_NAME = "termux-styling";
+    public static final String TERMUX_STYLING_GITHUB_REPO_URL = TERMUX_GITHUB_ORGANIZATION_URL + "/" + TERMUX_STYLING_GITHUB_REPO_NAME;
+    public static final String TERMUX_STYLING_GITHUB_ISSUES_REPO_URL = TERMUX_STYLING_GITHUB_REPO_URL + "/issues";
+    public static final String TERMUX_STYLING_FDROID_PACKAGE_URL = FDROID_PACKAGES_BASE_URL + "/" + TERMUX_STYLING_PACKAGE_NAME;
+
+    public static final String TERMUX_TASKER_APP_NAME = "Tycoonfu:Tasker";
+    public static final String TERMUX_TASKER_PACKAGE_NAME = TERMUX_PACKAGE_NAME + ".tasker";
+    public static final String TERMUX_TASKER_GITHUB_REPO_NAME = "termux-tasker";
+    public static final String TERMUX_TASKER_GITHUB_REPO_URL = TERMUX_GITHUB_ORGANIZATION_URL + "/" + TERMUX_TASKER_GITHUB_REPO_NAME;
+    public static final String TERMUX_TASKER_GITHUB_ISSUES_REPO_URL = TERMUX_TASKER_GITHUB_REPO_URL + "/issues";
+    public static final String TERMUX_TASKER_FDROID_PACKAGE_URL = FDROID_PACKAGES_BASE_URL + "/" + TERMUX_TASKER_PACKAGE_NAME;
+
+    public static final String TERMUX_WIDGET_APP_NAME = "Tycoonfu:Widget";
+    public static final String TERMUX_WIDGET_PACKAGE_NAME = TERMUX_PACKAGE_NAME + ".widget";
+    public static final String TERMUX_WIDGET_GITHUB_REPO_NAME = "termux-widget";
+    public static final String TERMUX_WIDGET_GITHUB_REPO_URL = TERMUX_GITHUB_ORGANIZATION_URL + "/" + TERMUX_WIDGET_GITHUB_REPO_NAME;
+    public static final String TERMUX_WIDGET_GITHUB_ISSUES_REPO_URL = TERMUX_WIDGET_GITHUB_REPO_URL + "/issues";
+    public static final String TERMUX_WIDGET_FDROID_PACKAGE_URL = FDROID_PACKAGES_BASE_URL + "/" + TERMUX_WIDGET_PACKAGE_NAME;
+
+    public static final List<String> TERMUX_PLUGIN_APP_NAMES_LIST = Arrays.asList(
+        TERMUX_API_APP_NAME, TERMUX_BOOT_APP_NAME, TERMUX_FLOAT_APP_NAME,
+        TERMUX_STYLING_APP_NAME, TERMUX_TASKER_APP_NAME, TERMUX_WIDGET_APP_NAME
+    );
+
+    public static final List<String> TERMUX_PLUGIN_APP_PACKAGE_NAMES_LIST = Arrays.asList(
+        TERMUX_API_PACKAGE_NAME, TERMUX_BOOT_PACKAGE_NAME, TERMUX_FLOAT_PACKAGE_NAME,
+        TERMUX_STYLING_PACKAGE_NAME, TERMUX_TASKER_PACKAGE_NAME, TERMUX_WIDGET_PACKAGE_NAME
+    );
+
+    @SuppressLint("SdCardPath")
+    public static final String TERMUX_INTERNAL_PRIVATE_APP_DATA_DIR_PATH = "/data/data/" + TERMUX_PACKAGE_NAME;
+    public static final File TERMUX_INTERNAL_PRIVATE_APP_DATA_DIR = new File(TERMUX_INTERNAL_PRIVATE_APP_DATA_DIR_PATH);
+
+    public static final String TERMUX_FILES_DIR_PATH = TERMUX_INTERNAL_PRIVATE_APP_DATA_DIR_PATH + "/files";
+    public static final File TERMUX_FILES_DIR = new File(TERMUX_FILES_DIR_PATH);
+
+    public static final String TERMUX_PREFIX_DIR_PATH = TERMUX_FILES_DIR_PATH + "/usr";
+    public static final File TERMUX_PREFIX_DIR = new File(TERMUX_PREFIX_DIR_PATH);
+
+    public static final String TERMUX_STAGING_PREFIX_DIR_PATH = TERMUX_FILES_DIR_PATH + "/usr-staging";
+    public static final File TERMUX_STAGING_PREFIX_DIR = new File(TERMUX_STAGING_PREFIX_DIR_PATH);
+
+    public static final String TERMUX_BIN_PREFIX_DIR_PATH = TERMUX_PREFIX_DIR_PATH + "/bin";
+    public static final File TERMUX_BIN_PREFIX_DIR = new File(TERMUX_BIN_PREFIX_DIR_PATH);
+
+    public static final String TERMUX_ETC_PREFIX_DIR_PATH = TERMUX_PREFIX_DIR_PATH + "/etc";
+    public static final File TERMUX_ETC_PREFIX_DIR = new File(TERMUX_ETC_PREFIX_DIR_PATH);
+
+    public static final String TERMUX_INCLUDE_PREFIX_DIR_PATH = TERMUX_PREFIX_DIR_PATH + "/include";
+    public static final File TERMUX_INCLUDE_PREFIX_DIR = new File(TERMUX_INCLUDE_PREFIX_DIR_PATH);
+
+    public static final String TERMUX_LIB_PREFIX_DIR_PATH = TERMUX_PREFIX_DIR_PATH + "/lib";
+    public static final File TERMUX_LIB_PREFIX_DIR = new File(TERMUX_LIB_PREFIX_DIR_PATH);
+
+    public static final String TERMUX_LIBEXEC_PREFIX_DIR_PATH = TERMUX_PREFIX_DIR_PATH + "/libexec";
+    public static final File TERMUX_LIBEXEC_PREFIX_DIR = new File(TERMUX_LIBEXEC_PREFIX_DIR_PATH);
+
+    public static final String TERMUX_SHARE_PREFIX_DIR_PATH = TERMUX_PREFIX_DIR_PATH + "/share";
+    public static final File TERMUX_SHARE_PREFIX_DIR = new File(TERMUX_SHARE_PREFIX_DIR_PATH);
+
+    public static final String TERMUX_TMP_PREFIX_DIR_PATH = TERMUX_PREFIX_DIR_PATH + "/tmp";
+    public static final File TERMUX_TMP_PREFIX_DIR = new File(TERMUX_TMP_PREFIX_DIR_PATH);
+
+    public static final String TERMUX_VAR_PREFIX_DIR_PATH = TERMUX_PREFIX_DIR_PATH + "/var";
+    public static final File TERMUX_VAR_PREFIX_DIR = new File(TERMUX_VAR_PREFIX_DIR_PATH);
+
+    public static final String TERMUX_HOME_DIR_PATH = TERMUX_FILES_DIR_PATH + "/home";
+    public static final File TERMUX_HOME_DIR = new File(TERMUX_HOME_DIR_PATH);
+
+    public static final String TERMUX_CONFIG_HOME_DIR_PATH = TERMUX_HOME_DIR_PATH + "/.config/termux";
+    public static final File TERMUX_CONFIG_HOME_DIR = new File(TERMUX_CONFIG_HOME_DIR_PATH);
+
+    public static final String TERMUX_CONFIG_PREFIX_DIR_PATH = TERMUX_ETC_PREFIX_DIR_PATH + "/termux";
+    public static final File TERMUX_CONFIG_PREFIX_DIR = new File(TERMUX_CONFIG_PREFIX_DIR_PATH);
+
+    public static final String TERMUX_ENV_PREFIX_ROOT = "/data/data/" + TERMUX_PACKAGE_NAME + "/files/usr";
+    public static final String TERMUX_ENV_FILE_PATH = TERMUX_CONFIG_PREFIX_DIR_PATH + "/termux.env";
+    public static final String TERMUX_ENV_TEMP_FILE_PATH = TERMUX_CONFIG_PREFIX_DIR_PATH + "/termux.env.tmp";
+
+    public static final String TERMUX_APPS_DIR_PATH = TERMUX_FILES_DIR_PATH + "/apps";
+
+    public static final String TERMUX_CRASH_LOG_FILE_PATH = TERMUX_HOME_DIR_PATH + "/crash-log.md";
+    public static final String TERMUX_CRASH_LOG_BACKUP_FILE_PATH = TERMUX_HOME_DIR_PATH + "/crash-log.backup.md";
+
+    public static final String TERMUX_APP_NOTIFICATION_CHANNEL_ID = "termux_notification_channel";
+    public static final String TERMUX_APP_NOTIFICATION_CHANNEL_NAME = "Tycoonfu App";
+    public static final int TERMUX_APP_NOTIFICATION_ID = 1337;
+
+    public static final String TERMUX_RUN_COMMAND_NOTIFICATION_CHANNEL_ID = "termux_run_command_notification_channel";
+    public static final String TERMUX_RUN_COMMAND_NOTIFICATION_CHANNEL_NAME = "Tycoonfu RunCommandService";
+    public static final int TERMUX_RUN_COMMAND_NOTIFICATION_ID = 1338;
+
+    public static final String BROADCAST_TERMUX_OPENED = TERMUX_PACKAGE_NAME + ".app.OPENED";
+
+    public static final class TERMUX_APP {
+        public static final String BUILD_CONFIG_CLASS_NAME = TERMUX_PACKAGE_NAME + ".BuildConfig";
+        public static final String TERMUX_ACTIVITY_NAME = TERMUX_PACKAGE_NAME + ".app.TermuxActivity";
+        public static final String TERMUX_SERVICE_NAME = TERMUX_PACKAGE_NAME + ".app.TermuxService";
+        public static final String RUN_COMMAND_SERVICE_NAME = TERMUX_PACKAGE_NAME + ".app.RunCommandService";
+
+        public static final String APPS_DIR_PATH = TERMUX_APPS_DIR_PATH + "/" + TERMUX_PACKAGE_NAME;
+        public static final String TERMUX_AM_SOCKET_FILE_PATH = TERMUX_FILES_DIR_PATH + "/termux-am.sock";
+
+        public static final String FILE_SHARE_RECEIVER_ACTIVITY_CLASS_NAME = TERMUX_PACKAGE_NAME + ".app.api.file.FileShareReceiverActivity";
+        public static final String FILE_VIEW_RECEIVER_ACTIVITY_CLASS_NAME = TERMUX_PACKAGE_NAME + ".app.api.file.FileViewReceiverActivity";
+
+        public static final class TERMUX_ACTIVITY {
+            public static final String ACTION_FAILSAFE_SESSION = TERMUX_PACKAGE_NAME + ".app.failsafe_session";
+            public static final String ACTION_NOTIFY_APP_CRASH = TERMUX_PACKAGE_NAME + ".app.notify_app_crash";
+            public static final String ACTION_RELOAD_STYLE = TERMUX_PACKAGE_NAME + ".app.reload_style";
+            public static final String ACTION_REQUEST_PERMISSIONS = TERMUX_PACKAGE_NAME + ".app.request_permissions";
+            public static final String EXTRA_FAILSAFE_SESSION = TERMUX_PACKAGE_NAME + ".app.failsafe_session";
+            public static final String EXTRA_RECREATE_ACTIVITY = TERMUX_PACKAGE_NAME + ".app.recreate_activity";
         }
-        Context pkgContext = PackageUtils.getContextForPackage(context, TermuxConstants.TERMUX_PACKAGE_NAME);
-        return pkgContext != null ? pkgContext : context;
-    }
 
-    /**
-     * Get the {@link Context} for {@link TermuxConstants#TERMUX_PACKAGE_NAME} package with the
-     * {@link Context#CONTEXT_INCLUDE_CODE} flag.
-     *
-     * @param context The {@link Context} to use to get the {@link Context} of the package.
-     * @return Returns the {@link Context}.
-     */
-    public static Context getTermuxPackageContextWithCode(@NonNull Context context) {
-        if (context.getPackageName().equals(TermuxConstants.TERMUX_PACKAGE_NAME)) {
-            return context;
+        public static final class TERMUX_SERVICE {
+            public static final String ACTION_STOP_SERVICE = TERMUX_PACKAGE_NAME + ".service_stop";
+            public static final String EXTRA_ACTION = TERMUX_PACKAGE_NAME + ".service_action";
+            public static final String EXTRA_SHELL_NAME = TERMUX_PACKAGE_NAME + ".shell_name";
+            public static final String EXTRA_SESSION_ACTION = TERMUX_PACKAGE_NAME + ".session_action";
+            public static final String EXTRA_COMMAND_LABEL = TERMUX_PACKAGE_NAME + ".command_label";
+            public static final String EXTRA_COMMAND_DESCRIPTION = TERMUX_PACKAGE_NAME + ".command_description";
+            public static final String EXTRA_COMMAND_HELP = TERMUX_PACKAGE_NAME + ".command_help";
+            public static final String EXTRA_PLUGIN_API_HELP = TERMUX_PACKAGE_NAME + ".plugin_api_help";
+            public static final String EXTRA_STDIN = TERMUX_PACKAGE_NAME + ".stdin";
+            public static final String EXTRA_RUNNER = TERMUX_PACKAGE_NAME + ".runner";
+            public static final String EXTRA_SESSION_CREATE_MODE = TERMUX_PACKAGE_NAME + ".session_create_mode";
+            public static final String EXTRA_BACKGROUND_CUSTOM_LOG_LEVEL = TERMUX_PACKAGE_NAME + ".background_custom_log_level";
         }
-        Context pkgContext = PackageUtils.getContextForPackage(context, TermuxConstants.TERMUX_PACKAGE_NAME, Context.CONTEXT_INCLUDE_CODE);
-        return pkgContext != null ? pkgContext : context;
+
+        public static final class RUN_COMMAND_SERVICE {
+            public static final String RUN_COMMAND_API_HELP_URL = TERMUX_GITHUB_REPO_URL + "#run-command-service";
+            public static final String EXTRA_COMMAND_PATH = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_PATH";
+            public static final String EXTRA_ARGUMENTS = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_ARGUMENTS";
+            public static final String EXTRA_WORKDIR = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_WORKDIR";
+            public static final String EXTRA_BACKGROUND = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_BACKGROUND";
+            public static final String EXTRA_SESSION_ACTION = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_SESSION_ACTION";
+            public static final String EXTRA_COMMAND_LABEL = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_COMMAND_LABEL";
+            public static final String EXTRA_COMMAND_DESCRIPTION = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_COMMAND_DESCRIPTION";
+            public static final String EXTRA_COMMAND_HELP = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_COMMAND_HELP";
+            public static final String EXTRA_PENDING_INTENT = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_PENDING_INTENT";
+            public static final String EXTRA_STDIN = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_STDIN";
+            public static final String EXTRA_RUNNER = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_RUNNER";
+            public static final String EXTRA_SHELL_NAME = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_SHELL_NAME";
+            public static final String EXTRA_SHELL_CREATE_MODE = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_SHELL_CREATE_MODE";
+            public static final String EXTRA_BACKGROUND_CUSTOM_LOG_LEVEL = TERMUX_PACKAGE_NAME + ".RUN_COMMAND_BACKGROUND_CUSTOM_LOG_LEVEL";
+        }
     }
 
-    /**
-     * Get the {@link Context} for {@link TermuxConstants#TERMUX_API_PACKAGE_NAME} package.
-     *
-     * @param context The {@link Context} to use to get the {@link Context} of the package.
-     * @return Returns the {@link Context}. This will {@code null} if an exception is raised.
-     */
-    public static Context getTermuxAPIPackageContext(@NonNull Context context) {
-        return PackageUtils.getContextForPackage(context, TermuxConstants.TERMUX_API_PACKAGE_NAME);
+    public static final class TERMUX_API_APP {
+        public static final String TERMUX_API_ACTIVITY_NAME = TERMUX_API_PACKAGE_NAME + ".TermuxApiActivity";
     }
 
-    /**
-     * Get the {@link Context} for {@link TermuxConstants#TERMUX_BOOT_PACKAGE_NAME} package.
-     *
-     * @param context The {@link Context} to use to get the {@link Context} of the package.
-     * @return Returns the {@link Context}. This will {@code null} if an exception is raised.
-     */
-    public static Context getTermuxBootPackageContext(@NonNull Context context) {
-        return PackageUtils.getContextForPackage(context, TermuxConstants.TERMUX_BOOT_PACKAGE_NAME);
-    }
-
-    /**
-     * Get the {@link Context} for {@link TermuxConstants#TERMUX_FLOAT_PACKAGE_NAME} package.
-     *
-     * @param context The {@link Context} to use to get the {@link Context} of the package.
-     * @return Returns the {@link Context}. This will {@code null} if an exception is raised.
-     */
-    public static Context getTermuxFloatPackageContext(@NonNull Context context) {
-        return PackageUtils.getContextForPackage(context, TermuxConstants.TERMUX_FLOAT_PACKAGE_NAME);
-    }
-
-    /**
-     * Get the {@link Context} for {@link TermuxConstants#TERMUX_STYLING_PACKAGE_NAME} package.
-     *
-     * @param context The {@link Context} to use to get the {@link Context} of the package.
-     * @return Returns the {@link Context}. This will {@code null} if an exception is raised.
-     */
-    public static Context getTermuxStylingPackageContext(@NonNull Context context) {
-        return PackageUtils.getContextForPackage(context, TermuxConstants.TERMUX_STYLING_PACKAGE_NAME);
-    }
-
-    /**
-     * Get the {@link Context} for {@link TermuxConstants#TERMUX_TASKER_PACKAGE_NAME} package.
-     *
-     * @param context The {@link Context} to use to get the {@link Context} of the package.
-     * @return Returns the {@link Context}. This will {@code null} if an exception is raised.
-     */
-    public static Context getTermuxTaskerPackageContext(@NonNull Context context) {
-        return PackageUtils.getContextForPackage(context, TermuxConstants.TERMUX_TASKER_PACKAGE_NAME);
-    }
-
-    /**
-     * Get the {@link Context} for {@link TermuxConstants#TERMUX_WIDGET_PACKAGE_NAME} package.
-     *
-     * @param context The {@link Context} to use to get the {@link Context} of the package.
-     * @return Returns the {@link Context}. This will {@code null} if an exception is raised.
-     */
-    public static Context getTermuxWidgetPackageContext(@NonNull Context context) {
-        return PackageUtils.getContextForPackage(context, TermuxConstants.TERMUX_WIDGET_PACKAGE_NAME);
-    }
-
-    /** Wrapper for {@link PackageUtils#getContextForPackageOrExitApp(Context, String, boolean, String)}. */
-    public static Context getContextForPackageOrExitApp(@NonNull Context context, String packageName,
-                                                        final boolean exitAppOnError) {
-        return PackageUtils.getContextForPackageOrExitApp(context, packageName, exitAppOnError, TermuxConstants.TERMUX_GITHUB_REPO_URL);
-    }
-
-    public static String isTermuxAppInstalled(@NonNull final Context context) {
-        return PackageUtils.isAppInstalled(context, TermuxConstants.TERMUX_APP_NAME, TermuxConstants.TERMUX_PACKAGE_NAME);
-    }
-
-    public static String isTermuxAPIAppInstalled(@NonNull final Context context) {
-        return PackageUtils.isAppInstalled(context, TermuxConstants.TERMUX_API_APP_NAME, TermuxConstants.TERMUX_API_PACKAGE_NAME);
-    }
-
-    public static String isTermuxAppAccessible(@NonNull final Context currentPackageContext) {
-        String errmsg = isTermuxAppInstalled(currentPackageContext);
-        if (errmsg == null) {
-            Context termuxPackageContext = TermuxUtils.getTermuxPackageContext(currentPackageContext);
-            if (termuxPackageContext == null)
-                errmsg = currentPackageContext.getString(R.string.error_termux_app_package_context_not_accessible);
-
-            if (errmsg == null) {
-                Error error = TermuxFileUtils.isTermuxPrefixDirectoryAccessible(false, false);
-                if (error != null)
-                    errmsg = currentPackageContext.getString(R.string.error_termux_prefix_dir_path_not_accessible,
-                        PackageUtils.getAppNameForPackage(currentPackageContext));
+    public static final class TERMUX_BOOT_APP {}
+    public static final class TERMUX_FLOAT_APP {}
+    public static final class TERMUX_STYLING_APP {}
+    public static final class TERMUX_TASKER_APP {}
+    public static final class TERMUX_WIDGET_APP {}
             }
-        }
-
-        if (errmsg != null)
-            return errmsg + " " + currentPackageContext.getString(R.string.msg_termux_app_required_by_app,
-                PackageUtils.getAppNameForPackage(currentPackageContext));
-        else
-            return null;
-    }
-
-    public static Object getTermuxAppAPKBuildConfigClassField(@NonNull Context currentPackageContext,
-                                                              @NonNull String fieldName) {
-        return getTermuxAppAPKClassField(currentPackageContext, TERMUX_APP.BUILD_CONFIG_CLASS_NAME, fieldName);
-    }
-
-    public static Object getTermuxAppAPKClassField(@NonNull Context currentPackageContext,
-                                                   @NonNull String clazzName, @NonNull String fieldName) {
-        try {
-            Context termuxPackageContext = TermuxUtils.getTermuxPackageContextWithCode(currentPackageContext);
-            if (termuxPackageContext == null)
-                return null;
-
-            Class<?> clazz = termuxPackageContext.getClassLoader().loadClass(clazzName);
-            return ReflectionUtils.invokeField(clazz, fieldName, null).value;
-        } catch (Exception e) {
-            Logger.logStackTraceWithMessage(LOG_TAG, "Failed to get \"" + fieldName + "\" value from \"" + clazzName + "\" class", e);
-            return null;
-        }
-    }
-
-    public static boolean isUriDataForTermuxOrPluginPackage(@NonNull Uri data) {
-        return data.toString().equals("package:" + TermuxConstants.TERMUX_PACKAGE_NAME) ||
-            data.toString().startsWith("package:" + TermuxConstants.TERMUX_PACKAGE_NAME + ".");
-    }
-
-    public static boolean isUriDataForTermuxPluginPackage(@NonNull Uri data) {
-        return data.toString().startsWith("package:" + TermuxConstants.TERMUX_PACKAGE_NAME + ".");
-    }
-
-    public static void sendTermuxOpenedBroadcast(@NonNull Context context) {
-        Intent broadcast = new Intent(TermuxConstants.BROADCAST_TERMUX_OPENED);
-        List<ResolveInfo> matches = context.getPackageManager().queryBroadcastReceivers(broadcast, 0);
-
-        for (ResolveInfo info : matches) {
-            Intent explicitBroadcast = new Intent(broadcast);
-            ComponentName cname = new ComponentName(info.activityInfo.applicationInfo.packageName,
-                info.activityInfo.name);
-            explicitBroadcast.setComponent(cname);
-            context.sendBroadcast(explicitBroadcast);
-        }
-    }
-
-    public static String getAppInfoMarkdownString(final Context currentPackageContext, final AppInfoMode appInfoMode) {
-        return getAppInfoMarkdownString(currentPackageContext, appInfoMode, null);
-    }
-
-    public static String getAppInfoMarkdownString(final Context currentPackageContext, final AppInfoMode appInfoMode, @Nullable String callingPackageName) {
-        if (appInfoMode == null) return null;
-
-        StringBuilder appInfo = new StringBuilder();
-        switch (appInfoMode) {
-            case TERMUX_PACKAGE:
-                return getAppInfoMarkdownString(currentPackageContext, false);
-
-            case TERMUX_AND_PLUGIN_PACKAGE:
-                return getAppInfoMarkdownString(currentPackageContext, true);
-
-            case TERMUX_AND_PLUGIN_PACKAGES:
-                appInfo.append(TermuxUtils.getAppInfoMarkdownString(currentPackageContext, false));
-
-                String termuxPluginAppsInfo =  TermuxUtils.getTermuxPluginAppsInfoMarkdownString(currentPackageContext);
-                if (termuxPluginAppsInfo != null)
-                    appInfo.append("\n\n").append(termuxPluginAppsInfo);
-                return appInfo.toString();
-
-            case TERMUX_PLUGIN_PACKAGES:
-                return TermuxUtils.getTermuxPluginAppsInfoMarkdownString(currentPackageContext);
-
-            case TERMUX_AND_CALLING_PACKAGE:
-                appInfo.append(TermuxUtils.getAppInfoMarkdownString(currentPackageContext, false));
-                if (!DataUtils.isNullOrEmpty(callingPackageName)) {
-                    String callingPackageAppInfo = null;
-                    if (TermuxConstants.TERMUX_PLUGIN_APP_PACKAGE_NAMES_LIST.contains(callingPackageName)) {
-                        Context termuxPluginAppContext = PackageUtils.getContextForPackage(currentPackageContext, callingPackageName);
-                        if (termuxPluginAppContext != null)
-                            appInfo.append(getAppInfoMarkdownString(termuxPluginAppContext, false));
-                        else
-                            callingPackageAppInfo = AndroidUtils.getAppInfoMarkdownString(currentPackageContext, callingPackageName);
-                    } else {
-                        callingPackageAppInfo = AndroidUtils.getAppInfoMarkdownString(currentPackageContext, callingPackageName);
-                    }
-
-                    if (callingPackageAppInfo != null) {
-                        ApplicationInfo applicationInfo = PackageUtils.getApplicationInfoForPackage(currentPackageContext, callingPackageName);
-                        if (applicationInfo != null) {
-                            appInfo.append("\n\n## ").append(PackageUtils.getAppNameForPackage(currentPackageContext, applicationInfo)).append(" App Info\n");
-                            appInfo.append(callingPackageAppInfo);
-                            appInfo.append("\n##\n");
-                        }
-                    }
-                }
-                return appInfo.toString();
-
-            default:
-                return null;
-        }
-    }
-
-    public static String getAppInfoMarkdownString(final Context currentPackageContext, boolean returnMarkdown) {
-        return PackageUtils.getAppInfoMarkdownString(currentPackageContext, returnMarkdown);
-    }
-
-    public static String getTermuxPluginAppsInfoMarkdownString(final Context currentPackageContext) {
-        if (currentPackageContext == null) return "null";
-        StringBuilder markdownString = new StringBuilder();
-        List<String> termuxPluginAppPackageNamesList = TermuxConstants.TERMUX_PLUGIN_APP_PACKAGE_NAMES_LIST;
-        for (int i = 0; i < termuxPluginAppPackageNamesList.size(); i++) {
-            String packageName = termuxPluginAppPackageNamesList.get(i);
-            Context termuxPluginAppContext = PackageUtils.getContextForPackage(currentPackageContext, packageName);
-            if (termuxPluginAppContext != null) {
-                if (i != 0) markdownString.append("\n\n");
-                markdownString.append(getAppInfoMarkdownString(termuxPluginAppContext, false));
-            }
-        }
-        return markdownString.toString();
-    }
-                               }
+            
