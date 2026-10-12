@@ -12,6 +12,11 @@ import java.util.Arrays;
 import java.util.Formatter;
 import java.util.List;
 
+/*
+ * Version: v0.53.0
+ * SPDX-License-Identifier: MIT
+ */
+
 public final class TermuxConstants {
 
     public static final String COMMA_NORMAL = ",";
@@ -237,6 +242,7 @@ public final class TermuxConstants {
     }
 
     public static final class TERMUX_FLOAT_APP {
+        public static final String TERMUX_FLOAT_SERVICE_NAME = TERMUX_FLOAT_PACKAGE_NAME + ".TermuxFloatService";
         public static final String DEFAULT_PREFERENCES_FILE_BASENAME_WITHOUT_EXTENSION = TERMUX_FLOAT_PACKAGE_NAME + "_preferences";
     }
 
@@ -253,4 +259,13 @@ public final class TermuxConstants {
         public static final String TERMUX_WIDGET_ACTIVITY_NAME = TERMUX_WIDGET_PACKAGE_NAME + ".TermuxWidgetActivity";
         public static final String DEFAULT_PREFERENCES_FILE_BASENAME_WITHOUT_EXTENSION = TERMUX_WIDGET_PACKAGE_NAME + "_preferences";
     }
+
+    // TermuxPluginUtils lines 212-218 ke exact constants
+    public static final String TERMUX_API_APPLICATION_NAME = TERMUX_API_APP_NAME;
+    public static final String TERMUX_BOOT_APPLICATION_NAME = TERMUX_BOOT_APP_NAME;
+    public static final String TERMUX_FLOAT_APPLICATION_NAME = TERMUX_FLOAT_APP_NAME;
+    public static final String TERMUX_STYLING_APPLICATION_NAME = TERMUX_STYLING_APP_NAME;
+    public static final String TERMUX_TASKER_APPLICATION_NAME = TERMUX_TASKER_APP_NAME;
+    public static final String TERMUX_WIDGET_APPLICATION_NAME = TERMUX_WIDGET_APP_NAME;
 }
+
